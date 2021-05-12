@@ -1,31 +1,31 @@
-import app from '../lib/app.js';
-import supertest from 'supertest';
+import geoData from '../data/geo';
+import { formatGeo } from '../lib/munge-utils';
 
-const request = supertest(app);
+describe('API data mugging', () => {
 
-describe('API Routes', () => {
+  const expectedGeo = [
+    {
+      formatted_query: 'Portland, Multnomah County, Oregon, USA',
+      latitude: '45.5202471',
+      longitude: '-122.6741949'
+    },
+    {
+      formatted_query: 'Portland, Cumberland County, Maine, USA',
+      latitude: '43.6610277',
+      longitude: '-70.2548596'
+    },
+    {
+      formatted_query: 'Portland, San Patricio County, Texas, USA',
+      latitude: '27.8768086',
+      longitude: '-97.3233874'
+    }
+  ];
 
-  // If a GET request is made to /api/cats, does:
-  // 1) the server respond with status of 200
-  // 2) the body match the expected API data?
-  it('GET /api/cats', async () => {
-    // act - make the request
-    const response = await request.get('/api/cats');
+  it('mugs geo data', async () => {
 
-    // was response OK (200)?
-    expect(response.status).toBe(200);
+    const output = formatGeo(geoData);
 
-    // did it return the data we expected?
-    expect(response.body).toEqual(expectedCats);
-
+    expect(output).toEqual(expectedGeo);
   });
 
-  // If a GET request is made to /api/cats/:id, does:
-  // 1) the server respond with status of 200
-  // 2) the body match the expected API data for the cat with that id?
-  test('GET /api/cats/:id', async () => {
-    const response = await request.get('/api/cats/2');
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(expectedCats[1]);
-  });
 });
