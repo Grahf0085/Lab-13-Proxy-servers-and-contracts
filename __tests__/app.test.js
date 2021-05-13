@@ -1,116 +1,66 @@
-import app from '../lib/app.js';
-import supertest from 'supertest';
-import client from '../lib/client.js';
-import { execSync } from 'child_process';
+import geoData from '../data/geo';
+import { formatGeo, formatWeather, formatReview } from '../lib/munge-utils';
+import weatherData from '../data/weather';
+import reviewData from '../data/yelp';
 
-const request = supertest(app);
+describe('API data mugging', () => {
 
-describe('API Routes', () => {
+  const expectedGeo =
+  {
+    formatted_query: 'Portland, Multnomah County, Oregon, USA',
+    latitude: '45.5202471',
+    longitude: '-122.6741949'
+  };
 
-  beforeAll(() => {
-    execSync('npm run setup-db');
+  const expectWeather =
+    [
+      {
+        forecast: 'Scattered clouds',
+        time: '2020-05-05'
+      },
+      {
+        forecast: 'Light snow',
+        time: '2020-05-06'
+      },
+    ];
+
+  const expectReview =
+    [
+      {
+        name: 'Andina Restaurant',
+        image_url: 'https://s3-media1.fl.yelpcdn.com/bphoto/Ij9yv97Ch6NwKhNdpezRhw/o.jpg',
+        price: '$$$',
+        rating: 4.5,
+        url: 'https://www.yelp.com/biz/andina-restaurant-portland?adjust_creative=D2ermI2XWiUpqusSd4z83Q&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=D2ermI2XWiUpqusSd4z83Q'
+      },
+      {
+        name: 'Lechon',
+        image_url: 'https://s3-media1.fl.yelpcdn.com/bphoto/1sE02Y1glmOvdRA54VIlYA/o.jpg',
+        price: '$$',
+        rating: 4.5,
+        url: 'https://www.yelp.com/biz/lechon-portland?adjust_creative=D2ermI2XWiUpqusSd4z83Q&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=D2ermI2XWiUpqusSd4z83Q',
+      },
+    ];
+
+  it('mugs geo data', async () => {
+
+    const output = formatGeo(geoData);
+
+    expect(output).toEqual(expectedGeo);
   });
 
-  afterAll(async () => {
-    return client.end();
+  it('mugs weather data', async () => {
+
+    const output = formatWeather(weatherData);
+
+    expect(output).toEqual(expectWeather);
   });
 
-  const expectedCats = [
-    {
-      id: expect.any(Number),
-      name: 'Felix',
-      type: 'Tuxedo',
-      url: 'cats/felix.png',
-      year: 1892,
-      lives: 3,
-      isSidekick: false
-    },
-    {
-      id: expect.any(Number),
-      name: 'Garfield',
-      type: 'Orange Tabby',
-      url: 'cats/garfield.jpeg',
-      year: 1978,
-      lives: 7,
-      isSidekick: false
-    },
-    {
-      id: expect.any(Number),
-      name: 'Duchess',
-      type: 'Angora',
-      url: 'cats/duchess.jpeg',
-      year: 1970,
-      lives: 9,
-      isSidekick: false
-    },
-    {
-      id: expect.any(Number),
-      name: 'Stimpy',
-      type: 'Manx',
-      url: 'cats/stimpy.jpeg',
-      year: 1990,
-      lives: 1,
-      isSidekick: true
-    },
-    {
-      id: expect.any(Number),
-      name: 'Sylvester',
-      type: 'Tuxedo',
-      url: 'cats/sylvester.jpeg',
-      year: 1945,
-      lives: 1,
-      isSidekick: true
-    },
-    {
-      id: expect.any(Number),
-      name: 'Tigger',
-      type: 'Orange Tabby',
-      url: 'cats/tigger.jpeg',
-      year: 1928,
-      lives: 8,
-      isSidekick: false
-    },
-    {
-      id: expect.any(Number),
-      name: 'Hello Kitty',
-      type: 'Angora',
-      url: 'cats/hello-kitty.jpeg',
-      year: 1974,
-      lives: 9,
-      isSidekick: false
-    },
-    {
-      id: expect.any(Number),
-      name: 'Hobbs',
-      type: 'Orange Tabby',
-      url: 'cats/hobbs.jpeg',
-      year: 1985,
-      lives: 6,
-      isSidekick: true
-    }
-  ];
+  it('mugs review data', async () => {
 
-  // If a GET request is made to /api/cats, does:
-  // 1) the server respond with status of 200
-  // 2) the body match the expected API data?
-  it('GET /api/cats', async () => {
-    // act - make the request
-    const response = await request.get('/api/cats');
+    const output = formatReview(reviewData);
 
-    // was response OK (200)?
-    expect(response.status).toBe(200);
-
-    // did it return the data we expected?
-    expect(response.body).toEqual(expectedCats);
-
+    expect(output).toEqual(expectReview);
   });
 
-  // If a GET request is made to /api/cats/:id, does:
-  // 1) the server respond with status of 200
-  // 2) the body match the expected API data for the cat with that id?
-  test('GET /api/cats/:id', async () => {
-    const response = await request.get('/api/cats/2');
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(expectedCats[1]);
-  });
 });
