@@ -1,25 +1,32 @@
 import geoData from '../data/geo';
-import { formatGeo } from '../lib/munge-utils';
+import { formatGeo, formatWeather, formatReview } from '../lib/munge-utils';
+import weatherData from '../data/weather';
 
 describe('API data mugging', () => {
 
-  const expectedGeo = [
-    {
-      formatted_query: 'Portland, Multnomah County, Oregon, USA',
-      latitude: '45.5202471',
-      longitude: '-122.6741949'
-    },
-    {
-      formatted_query: 'Portland, Cumberland County, Maine, USA',
-      latitude: '43.6610277',
-      longitude: '-70.2548596'
-    },
-    {
-      formatted_query: 'Portland, San Patricio County, Texas, USA',
-      latitude: '27.8768086',
-      longitude: '-97.3233874'
-    }
-  ];
+  const expectedGeo =
+  {
+    formatted_query: 'Portland, Multnomah County, Oregon, USA',
+    latitude: '45.5202471',
+    longitude: '-122.6741949'
+  };
+
+  const expectWeather =
+    [
+      {
+        forecast: 'Scattered clouds',
+        time: '2020-05-05'
+      },
+      {
+        forecast: 'Light snow',
+        time: '2020-05-06'
+      },
+    ];
+
+  const expectReview =
+    [
+
+    ];
 
   it('mugs geo data', async () => {
 
@@ -27,5 +34,19 @@ describe('API data mugging', () => {
 
     expect(output).toEqual(expectedGeo);
   });
+
+  it('mugs weather data', async () => {
+
+    const output = formatWeather(weatherData);
+
+    expect(output).toEqual(expectWeather);
+  });
+
+  it('mugs review data'), async () => {
+
+    const output = formatReview(reviewData);
+
+    expect(output).toEqual(expectReview);
+  };
 
 });
